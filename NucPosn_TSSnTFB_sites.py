@@ -20,14 +20,14 @@ pathTObam=sys.argv[1]
 
 # CSV FILE INFO
 
-file_path='/lifesci/groups/toh/nwiechens/common'
+file_path='/path/to/CSV/dir'
 # List CSV files seperated by comma
 csvlist=['SOX2_motifs_ChIP_mm9']
 # Specify the class of each CSV file seperated by comma, either TSS and TFB : TSS="Transcript start file", TFB="Transcription factor binding" sites
 TFBorTSS=["TFB"]  
 
 # OUTPUTDIR
-output_directory="/lifesci/groups/toh/nwiechens/seraina/Nuc_seq/"
+output_directory="/path/to/output/dir/"
 
 # SCRIPT PARAMETERS
 frag_size=500
@@ -75,16 +75,6 @@ read_count_end_coordinate=int(bp_dwn+cord_correct)
 # This variable is set to verify if the chromosome values are in "NN" or "chrNN" format
 #It is used later while reading chromosome values from csv files
 refl=int(len(bamfile.references[0]))
-
-# Put the list of all TF binding CSV files, the CSV files are named as "CTCF.csv","CHD2.csv"....etc
-# The CSV files have headers and are in format
-# chrmosome Start End
-
-file_path='/lifesci/groups/toh/nwiechens/common'
-#file_path='/lifesci/groups/toh/nwiechens/seraina/Nuc_seq/'
-csvlist=['SOX2_motifs_ChIP_mm9']
-TFBorTSS=["TFB"]
-
 
 # If it is required to go through only one CSV file like CTCF.csv then commentout the above list
 # and make csvlist variable with only one element
