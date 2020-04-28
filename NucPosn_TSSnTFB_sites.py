@@ -10,7 +10,7 @@ Created on Thu Apr 16 14:42:55 2020
 
 import scipy
 import numpy
-#import pysam
+import pysam
 import csv
 import os
 #import subprocess
@@ -64,22 +64,17 @@ bamfilePath=args.Path2bam
 ibamfile=args.bamfile
 # CSV FILE INFO
 
-<<<<<<< HEAD
+
 file_path=args.Path_2_CSVfiles
-=======
-file_path='/path/to/CSV/dir'
->>>>>>> e182e674127f1821745b0f66c673d3f2d117bbe6
+
 # List CSV files seperated by comma
 csvlist=(args.CSVfiles).split(sep=",")
 # Specify the class of each CSV file seperated by comma, either TSS and TFB : TSS="Transcript start file", TFB="Transcription factor binding" sites
 TFBorTSS=(args.TFB_or_TSS).split(sep=",")
 
 # OUTPUTDIR
-<<<<<<< HEAD
+
 output_directory=args.OutputDir
-=======
-output_directory="/path/to/output/dir/"
->>>>>>> e182e674127f1821745b0f66c673d3f2d117bbe6
 
 # SCRIPT PARAMETERS
 frag_size=500
@@ -130,10 +125,6 @@ read_count_end_coordinate=int(bp_dwn+cord_correct)
 #It is used later while reading chromosome values from csv files
 refl=int(len(bamfile.references[0]))
 
-<<<<<<< HEAD
-
-=======
->>>>>>> e182e674127f1821745b0f66c673d3f2d117bbe6
 # If it is required to go through only one CSV file like CTCF.csv then commentout the above list
 # and make csvlist variable with only one element
 #   csvlist=['TSS_TTseqGenes_0vs2h']
