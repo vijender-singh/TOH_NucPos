@@ -137,9 +137,9 @@ for x in csvlist:
     end=[]
     strand=[]
     clust_plot_index=[]
-    filename=str(csvlist[csvt]+'.csv')
+    filename=str(csvlist[csvt])
     print (filename)
-    initials=csvlist[csvt]
+    initials=csvlist[csvt][:-4]
     os.chdir(file_path)
     print ('Bamfile Analysed : ' + pathTObam,'\t CSV file analysed : '+filename )
     #openfile=csv.reader(open(filename,'rb'))
@@ -196,7 +196,7 @@ for x in csvlist:
         except (IndexError, ValueError):
             pass
         
-        if TFBorTSS[csvt] == "TSS"  and strand[csvt]=="-1":
+        if TFBorTSS[csvt] == "TSS"  and strand[csvt]=="-1" or strand[csvt]=="-" :
             signal_global+=signal_local[::-1]
         else:
             signal_global+=signal_local
