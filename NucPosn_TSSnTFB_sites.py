@@ -4,48 +4,94 @@
 Created on Thu Apr 16 14:42:55 2020
 
 @author: vijendersingh
+
 """
 
 
 import scipy
 import numpy
-import pysam
+#import pysam
 import csv
 import os
-import sys as sys
 #import subprocess
+import argparse
+from distutils.util import strtobool
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('-B', dest='Path2bam',default=os.getcwd(),
+                    help='Path to the bamfile(s) directory ')
+
+parser.add_argument('-b',  dest='bamfile',
+                    help='bamfile(s), if more than one provide seperated by comma e.g. sample1.bam,sample2.bam')
+
+parser.add_argument('-C', dest='Path_2_CSVfiles',default=os.getcwd(),
+                    help='Path to directory with CSV files')
+
+parser.add_argument('-c', dest='CSVfiles',
+                    help='CSV file(s), if more than one provide seperated by comma e.g. TFB1.csv,TSS.csv,TFB2.csv')
+
+parser.add_argument('-T', dest='TFB_or_TSS',
+                    help='Variable explaining data in CSV file, TFB or TSS.  The variable should match the position of csv file in -c option, list values seperated by comma e.g. TFB1,TSS,TFB2')
+
+parser.add_argument('-l', dest='FrangmentSize_lowerlimit',
+                    default=0,type=int,
+                    help='Minimum length of the sequenced fragment/insert (default = 0)')
+parser.add_argument('-L', dest='FrangmentSize_Upperlimit',
+                    default=1000,type=int,
+                    help='Maximum length of the sequenced fragment/insert (default = 1000)')
+
+parser.add_argument('-p', dest='Cluster_plot',default=False,type=strtobool,
+                    help='Heriarchial clustering of TFB/TSS sites; default=False')
+
+parser.add_argument('-f', dest='ClusterRegion',
+                    default=500,type=int,
+                    help='Regions flanking the TSS/TFB for heriarchial clustering analysis')
+
+parser.add_argument('-o', dest='OutputDir',default=os.getcwd(),
+                    help='Path to Output Dir ')
+
+parser.add_argument('-r', dest='FlankingRegion',
+                    default=2500,type=int,
+                    help='Regions flanking the TSS/TFB for analysis')
+
+
+args = parser.parse_args()
+
 
 # BAMFILE
-pathTObam=sys.argv[1]
-
+bamfilePath=args.Path2bam
+ibamfile=args.bamfile
 # CSV FILE INFO
 
-file_path='/lifesci/groups/toh/nwiechens/common'
+file_path=args.Path_2_CSVfiles
 # List CSV files seperated by comma
-csvlist=['SOX2_motifs_ChIP_mm9']
+csvlist=(args.CSVfiles).split(sep=",")
 # Specify the class of each CSV file seperated by comma, either TSS and TFB : TSS="Transcript start file", TFB="Transcription factor binding" sites
-TFBorTSS=["TFB"]  
+TFBorTSS=(args.TFB_or_TSS).split(sep=",")
 
 # OUTPUTDIR
-output_directory="/lifesci/groups/toh/nwiechens/seraina/Nuc_seq/"
+output_directory=args.OutputDir
 
 # SCRIPT PARAMETERS
 frag_size=500
 
-bp_up=2500
+bp_up=args.FlankingRegion
 
-bp_dwn=2500
+bp_dwn=args.FlankingRegion
 
-FrangmentSize_lowerlimit=0
+FrangmentSize_lowerlimit=args.FrangmentSize_lowerlimit
 
-FrangmentSize_Upperlimit=1000
+FrangmentSize_Upperlimit=args.FrangmentSize_Upperlimit
 
 # CLUSTER PLOT : Options:  TRUE or FALSE
-clust_plot=False
-
+clust_plot=args.Cluster_plot
+heriarchialClusterDataWindow=args.ClusterRegion
 
 ############################################################
-fileprefix=pathTObam.split("/")[-1][:-4]
+fileprefix=ibamfile[-1][:-4]
+
+pathTObam=bamfilePath+"/"+ibamfile
 
 bamfile=pysam.Samfile(pathTObam,"rb")
 
@@ -75,15 +121,6 @@ read_count_end_coordinate=int(bp_dwn+cord_correct)
 # This variable is set to verify if the chromosome values are in "NN" or "chrNN" format
 #It is used later while reading chromosome values from csv files
 refl=int(len(bamfile.references[0]))
-
-# Put the list of all TF binding CSV files, the CSV files are named as "CTCF.csv","CHD2.csv"....etc
-# The CSV files have headers and are in format
-# chrmosome Start End
-
-file_path='/lifesci/groups/toh/nwiechens/common'
-#file_path='/lifesci/groups/toh/nwiechens/seraina/Nuc_seq/'
-csvlist=['SOX2_motifs_ChIP_mm9']
-TFBorTSS=["TFB"]
 
 
 # If it is required to go through only one CSV file like CTCF.csv then commentout the above list
@@ -132,8 +169,11 @@ for x in csvlist:
               It is not specified if the files has TFB ot TSS  coocrdinates")
 
     signal_global=scipy.zeros((int(region_mid)))
+    clustMatxnCol=(2*heriarchialClusterDataWindow)+1
+    lowerClust=bp_up-heriarchialClusterDataWindow
+    upperClust=lowerClust+clustMatxnCol+1
     if clust_plot==True:
-        clust_matrix=scipy.zeros((1001))
+        clust_matrix=scipy.zeros((clustMatxnCol))
 
     icounter=0
     print (len(chromID))
@@ -159,8 +199,8 @@ for x in csvlist:
         else:
             signal_global+=signal_local
             
-        if clust_plot==True and numpy.sum(signal_local[1500:2501])>0:
-            clust_matrix=numpy.vstack((clust_matrix,signal_local[1500:2501]))
+        if clust_plot==True and numpy.sum(signal_local[lowerClust:upperClust])>0:
+            clust_matrix=numpy.vstack((clust_matrix,signal_local[lowerClust:upperClust]))
             clust_plot_index.append(chromID[icounter]+":"+str(start[icounter]))                                       
         if icounter==cordCounter:
             print (icounter)
